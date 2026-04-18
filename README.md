@@ -22,5 +22,5 @@ This project is a full-stack web application developed for the **Mid-term Assign
 ### Setup Instructions
 1. **Clone the repository:**
    ```bash
-   git clone <your-repo-link>
-   cd mid_term
+   git clone <[your-repo-link](https://github.com/mnmnmnmnm001/Docker.git)>
+   cd Docker_Mid_Term
