@@ -1,86 +1,82 @@
-version: '3.9'
+# networks:
+#   my-network:
+#     driver: bridge
 
-services:
-  # ── MongoDB Database ─────────────────────────────────────────────────────────
-  mongo:
-    image: mongo:6.0
-    container_name: taskmanager_mongo
-    restart: unless-stopped
-    environment:
-      MONGO_INITDB_DATABASE: taskmanager
-    volumes:
-      - mongo_data:/data/db
-      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
-    networks:
-      - app_network
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 40s
+# services:
+#   my-dotnet:
+#     container_name: dotnet-product
+#     build:
+#       dockerfile: Dockerfile
+#       context: .
+#     hostname: dotnet
+#     restart: always
+#     networks:
+#       - my-network
+#     ports:
+#       - "8080:8080"
+#     environment:
+#       - ASPNETCORE_ENVIRONMENT=Development
+#       - ASPNETCORE_URLS=http://+:8080
+#     depends_on:
+#       - my-sql
 
-  #Node.js Backend API
-  backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    container_name: taskmanager_backend
-    restart: unless-stopped
-    environment:
-      PORT: 5000
-      MONGO_URI: mongodb://mongo:27017/taskmanager
-      NODE_ENV: production
-    depends_on:
-      mongo:
-        condition: service_healthy
-    networks:
-      - app_network
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost:5000/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
-
-  #React Frontend
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: taskmanager_frontend
-    restart: unless-stopped
-    depends_on:
-      - backend
-    networks:
-      - app_network
-
-  #Nginx Reverse Proxy
-  nginx:
-    image: nginx:1.25-alpine
-    container_name: taskmanager_nginx
-    restart: unless-stopped
-    ports:
-      - "8080:80"
-    volumes:
-      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-    depends_on:
-      - frontend
-      - backend
-    networks:
-      - app_network
-    healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/health"]
-      interval: 30s
-      timeout: 5s
-      retries: 3
-
-#Volumes / data storage
-volumes:
-  mongo_data:
-    driver: local
-
-#Networks
+#   my-sql:
+#     container_name: mysql-product
+#     image: mysql:latest
+#     hostname: mysql
+#     restart: always
+#     networks:
+#       - my-network
+#     volumes:
+#       - ./db:/var/lib/mysql
+#       - ./db-init:/docker-entrypoint-initdb.d
+#     environment:
+#       - MYSQL_ROOT_PASSWORD=123abc
+#       - MYSQL_DATABASE=SchoolManagement
+#       - MYSQL_USER=siteuser
+#       - MYSQL_PASSWORD=sitepass
 networks:
-  app_network:
+  my-network:
+    name: school-management-net
     driver: bridge
+services:
+  my-dotnet:
+    container_name: dotnet-product
+    build:
+      dockerfile: Dockerfile
+      context: .
+    restart: always
+    networks:
+      - my-network
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=server=my-sql;port=3306;database=SchoolManagement;user=root;password=123abc
+    depends_on:
+      my-sql:
+        condition: service_healthy
+
+  my-sql:
+    container_name: mysql-product
+    image: mysql:latest
+    restart: always
+    ports:
+      - "3306:3306"
+    networks:
+      - my-network
+    volumes:
+      # - ./db:/var/lib/mysql
+      - ./db-init:/docker-entrypoint-initdb.d
+    environment:
+      - MYSQL_ROOT_PASSWORD=123abc
+      - MYSQL_DATABASE=SchoolManagement
+      # - MYSQL_USER=siteuser
+      # - MYSQL_PASSWORD=sitepass
+    healthcheck:
+      # test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123abc"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
