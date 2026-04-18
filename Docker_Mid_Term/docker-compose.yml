@@ -68,7 +68,7 @@ services:
       - my-network
     volumes:
       # - ./db:/var/lib/mysql
-      - ./db-init:/docker-entrypoint-initdb.d
+      - ./docker/mysql/init:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=123abc
       - MYSQL_DATABASE=SchoolManagement

@@ -39,11 +39,11 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY ["SchoolManagement/SchoolManagement.csproj", "SchoolManagement/"]
+COPY ["src/SchoolManagement/SchoolManagement.csproj", "SchoolManagement/"]
 RUN dotnet restore "SchoolManagement/SchoolManagement.csproj"
 
 COPY . .
-WORKDIR "/src/SchoolManagement"
+WORKDIR "/src/src/SchoolManagement"
 RUN dotnet build "SchoolManagement.csproj" -c Release -o /app/build
 
 FROM build AS publish
