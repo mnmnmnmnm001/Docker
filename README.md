@@ -28,12 +28,18 @@ This project is a full-stack web application developed for the **Mid-term Assign
    ```bash
    git clone -b dev https://github.com/mnmnmnmnm001/Docker.git
    ```
-2. **Open a terminal in the project root (where docker-compose.yml is located).**
+2. **Verify Docker is Running**
+   ```bash
+   docker --version
+   docker compose version
+   ```
+   You should see version numbers. If error, restart Docker Desktop.
+3. **Open a terminal in the project root (where docker-compose.yml is located).**
    ```bash
    cd Docker
    cd Docker_Mid_Term
    ```
-3. **Build and start all containers:**
+4. **Build and start all containers:**
    ```bash
    docker compose up --build
    ```
@@ -43,10 +49,30 @@ This project is a full-stack web application developed for the **Mid-term Assign
    mysql-product   |  xxxxxx [System] [MY-xxxxxxx] [Server] /usr/sbin/mysqld: ready for connections. Version: '9.6.0'  socket:   '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
    ```
    which will appear for program with database.
-5. **Open your browser and go to:**
+   After the first time, you can run this command to built faster:
+   ```bash
+   docker compose up -d
+   ```
+   -d = run in background (detached mode)
+5. **Check Container Status**
+   ```bash
+   docker ps
+   ```
+   You should see:
+   ```bash
+   dotnet-product (running on port 8080)
+   mysql-product (running on port 3306)
+   ```
+   Both should show Status: Up
+6. **Open your browser and go to:**
    ```bash
    http://localhost:8080
    ```
+   And navigate to different pages:
++Home page: http://localhost:8080/
++Students: http://localhost:8080/Students
++Courses: http://localhost:8080/Courses
+...
 
 ### TROUBLESHOOTING
   Problem : Port 8080 already in use
@@ -62,3 +88,15 @@ This project is a full-stack web application developed for the **Mid-term Assign
   Problem : Old data persists after restarting
   Fix     : Docker named volumes persist across restarts by design.
             Run `docker compose down -v` to wipe the database.
+
+### Command	Purpose
+docker compose up -d	                    Start containers
+docker compose down	                      Stop containers
+docker compose logs	                      View all logs
+docker ps	                                List running containers
+docker ps -a	                            List all containers
+docker compose restart	                  Restart containers
+docker compose rebuild	                  Rebuild images
+docker compose pull	                      Update images
+docker exec -it dotnet-product bash	      Enter .NET container shell
+docker exec -it mysql-product bash	      Enter MySQL container shell
