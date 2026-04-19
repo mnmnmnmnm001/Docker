@@ -22,8 +22,7 @@ This project is a full-stack web application developed for the **Mid-term Assign
 * OS: Windows 10/11, macOS 12+, or Ubuntu 20.04+
 * RAM: At least 4 GB free
 * Ports: 8080 must be free on your machine
-* MySQL: installed
-
+  
 ### Setup Instructions
 1. **Clone the repository:**
    ```bash
@@ -39,11 +38,15 @@ This project is a full-stack web application developed for the **Mid-term Assign
    docker compose up --build
    ```
    First run downloads base images and builds the app (~3-5 minutes).
-4. **Open your browser and go to:**
+   Wait until command line show this:
+   ```bash
+   mysql-product   |  xxxxxx [System] [MY-xxxxxxx] [Server] /usr/sbin/mysqld: ready for connections. Version: '9.6.0'  socket:   '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+   ```
+   which will appear for program with database.
+5. **Open your browser and go to:**
    ```bash
    http://localhost:8080
    ```
-
 
 ### TROUBLESHOOTING
   Problem : Port 8080 already in use
