@@ -1,40 +1,3 @@
-# networks:
-#   my-network:
-#     driver: bridge
-
-# services:
-#   my-dotnet:
-#     container_name: dotnet-product
-#     build:
-#       dockerfile: Dockerfile
-#       context: .
-#     hostname: dotnet
-#     restart: always
-#     networks:
-#       - my-network
-#     ports:
-#       - "8080:8080"
-#     environment:
-#       - ASPNETCORE_ENVIRONMENT=Development
-#       - ASPNETCORE_URLS=http://+:8080
-#     depends_on:
-#       - my-sql
-
-#   my-sql:
-#     container_name: mysql-product
-#     image: mysql:latest
-#     hostname: mysql
-#     restart: always
-#     networks:
-#       - my-network
-#     volumes:
-#       - ./db:/var/lib/mysql
-#       - ./db-init:/docker-entrypoint-initdb.d
-#     environment:
-#       - MYSQL_ROOT_PASSWORD=123abc
-#       - MYSQL_DATABASE=SchoolManagement
-#       - MYSQL_USER=siteuser
-#       - MYSQL_PASSWORD=sitepass
 networks:
   my-network:
     name: school-management-net
@@ -45,25 +8,34 @@ services:
     build:
       dockerfile: Dockerfile
       context: .
+    #hostname: dotnet
     restart: always
+    # always restart the container regardless of the exit status
     networks:
       - my-network
     ports:
       - "8080:8080"
+      # port 8080 is commonly used as an alternative to port 80 for HTTP traffic
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
+      # by default, ASPNETCORE_ENVIRONMENT = Production; we use Development for easier testing
       - ASPNETCORE_URLS=http://+:8080
       - ConnectionStrings__DefaultConnection=server=my-sql;port=3306;database=SchoolManagement;user=root;password=123abc
     depends_on:
       my-sql:
         condition: service_healthy
+        # ensures my-sql starts only after my-sql passes its healthcheck below
 
   my-sql:
     container_name: mysql-product
     image: mysql:latest
+    # what 'program name : version' to use
+    #hostname: mysql
     restart: always
+    # same as restart above
     ports:
       - "3306:3306"
+      # MySQL uses port 3306 by default for communication between the client and the MySQL server
     networks:
       - my-network
     volumes:
@@ -75,8 +47,11 @@ services:
       # - MYSQL_USER=siteuser
       # - MYSQL_PASSWORD=sitepass
     healthcheck:
-      # test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123abc"]
+      # what command to use to test, here it check checks the reachability of the MySQL server by sending a ping request to the specified host and user
       interval: 10s
+      # execute this command every 10 seconds
       timeout: 5s
+      # wait 5 seconds for a response for each attempt
       retries: 5
+      #maximum retries is 5 times
