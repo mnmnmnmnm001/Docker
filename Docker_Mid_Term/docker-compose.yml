@@ -1,18 +1,22 @@
 networks:
   my-network:
+  # define custom network
     name: school-management-net
     driver: bridge
+    # creates a virtual network that allows containers on the same host to communicate with each other while isolating them from containers on other networks
 services:
   my-dotnet:
     container_name: dotnet-product
     build:
       dockerfile: Dockerfile
-      context: .
-    #hostname: dotnet
+      context: . 
+      #build all
+    ##hostname: dotnet
     restart: always
     # always restart the container regardless of the exit status
     networks:
       - my-network
+      # use custom network defined above
     ports:
       - "8080:8080"
       # port 8080 is commonly used as an alternative to port 80 for HTTP traffic
@@ -30,7 +34,7 @@ services:
     container_name: mysql-product
     image: mysql:latest
     # what 'program name : version' to use
-    #hostname: mysql
+    ##hostname: mysql
     restart: always
     # same as restart above
     ports:
@@ -38,20 +42,22 @@ services:
       # MySQL uses port 3306 by default for communication between the client and the MySQL server
     networks:
       - my-network
+      # also use the same custom network
     volumes:
-      # - ./db:/var/lib/mysql
+      ## - ./db:/var/lib/mysql
       - ./docker/mysql/init:/docker-entrypoint-initdb.d
     environment:
       - MYSQL_ROOT_PASSWORD=123abc
       - MYSQL_DATABASE=SchoolManagement
-      # - MYSQL_USER=siteuser
-      # - MYSQL_PASSWORD=sitepass
+      ## - MYSQL_USER=siteuser
+      ## - MYSQL_PASSWORD=sitepass
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p123abc"]
-      # what command to use to test, here it check checks the reachability of the MySQL server by sending a ping request to the specified host and user
+      # what command to use to test, here it check checks the reachability of the MySQL server by 
+      # sending a ping request to the specified host and user
       interval: 10s
       # execute this command every 10 seconds
       timeout: 5s
       # wait 5 seconds for a response for each attempt
       retries: 5
-      #maximum retries is 5 times
+      # maximum retries is 5 times
